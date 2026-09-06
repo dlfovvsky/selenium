@@ -17,8 +17,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-require 'bazel/runfiles'
-
 module Selenium
   module WebDriver
     module SpecSupport
@@ -418,7 +416,10 @@ module Selenium
         end
 
         def runfiles
-          @runfiles ||= Bazel::Runfiles.create
+          @runfiles ||= begin
+            require 'bazel/runfiles'
+            Bazel::Runfiles.create
+          end
         end
 
         def runfiles_path(env_key)
