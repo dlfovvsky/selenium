@@ -258,8 +258,22 @@ module Selenium
           #  new Windows session sometimes silently abandons navigation
           # TODO - remove when this lands: https://issues.chromium.org/issues/402796660
           sleep 1 if Platform.windows? && browser_family == :chromium
+          print_driver_version(instance)
 
           instance
+        end
+
+        def print_driver_version(instance)
+          return if @driver_version_printed
+
+          path = instance.instance_variable_get(:@service_manager)&.instance_variable_get(:@executable_path)
+          return unless path
+
+          @driver_version_printed = true
+          version = IO.popen([path, '--version'], &:read).lines.first
+          puts "#{version}\n" if version
+        rescue StandardError => e
+          WebDriver.logger.warn("could not read driver version from #{path}: #{e.message}")
         end
 
         def build_options(**)
